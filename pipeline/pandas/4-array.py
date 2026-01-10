@@ -5,7 +5,6 @@ and returns them as a numpy.ndarray
 """
 
 import pandas as pd
-import numpy as np
 
 
 def array(df):
