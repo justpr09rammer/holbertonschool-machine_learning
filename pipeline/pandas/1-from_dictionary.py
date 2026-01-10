@@ -27,3 +27,4 @@ def from_dictionary():
         },
         index=list("ABCD"))
     return df
+df = from_dictionary()
