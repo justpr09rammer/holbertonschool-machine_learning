@@ -4,8 +4,6 @@ Function that selects the last 10 rows of High and Close columns
 and returns them as a numpy.ndarray
 """
 
-import pandas as pd
-
 
 def array(df):
     """
