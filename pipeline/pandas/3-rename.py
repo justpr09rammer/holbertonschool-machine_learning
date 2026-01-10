@@ -17,11 +17,10 @@ def rename(df):
     # 1. Rename column
     df = df.rename(columns={'Timestamp': 'Datetime'})
 
-    # 2. Convert to datetime
-    df['Datetime'] = pd.to_datetime(df['Datetime'])
+    # 2. Convert to datetime (timestamps in seconds)
+    df['Datetime'] = pd.to_datetime(df['Datetime'], unit='s')
 
     # 3. Keep only Datetime and Close
     df = df[['Datetime', 'Close']]
 
     return df
-
