@@ -3,14 +3,20 @@
 Defines function that creates a Pandas DataFrame from a Numpy ndarray
 """
 import pandas as pd
-import string
+
+
 def from_numpy(array):
-     """
-    function to create a dataframe
-    Args:
-        array: np.ndarray from which you should create the pd.DataFrame
-    Returns: newly created pd.DataFrame
     """
-    m = array.shapre[1]
-    cols = list(string.ascii_uppercase[:m])
+    Creates a pandas DataFrame from a numpy array
+    Args:
+        array (np.ndarray): input array
+    Returns:
+        pd.DataFrame: dataframe with columns named A, B, C, ...
+    """
+    m = array.shape[1]  # number of columns
+
+    # generate column names manually: A=65, B=66, ...
+    cols = [chr(65 + i) for i in range(m)]
+
     return pd.DataFrame(array, columns=cols)
+
