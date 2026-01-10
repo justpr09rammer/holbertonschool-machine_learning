@@ -3,6 +3,7 @@
 Defines function that creates a Pandas DataFrame from a Numpy ndarray
 """
 import pandas as pd
+import string
 def from_numpy(array):
      """
     function to create a dataframe
