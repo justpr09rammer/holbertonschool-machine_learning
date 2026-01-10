@@ -14,7 +14,7 @@ def slice(df):
         pd.DataFrame: sliced dataframe
     """
     # 1. Select required columns
-    df_selected = df[['High', 'Low', 'Close', 'Volume_BTC']]
+    df_selected = df[['High', 'Low', 'Close', 'Volume_(BTC)']]
     # 2. Select every 60th row
     df_sliced = df_selected.iloc[::60]
     return df_sliced
