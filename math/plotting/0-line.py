@@ -21,4 +21,3 @@ def line():
     # Set x-axis range exactly from 0 to 10
     plt.xlim(0, 10)
     plt.show()
-
