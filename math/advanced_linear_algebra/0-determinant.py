@@ -15,14 +15,12 @@ def multi_determinant(matrix):
     mat_l = len(matrix)
     if mat_l == 2 and len(matrix[0]) == 2:
         return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
-
     deter = 0
     cols = list(range(len(matrix)))
     for c in cols:
         mat_cp = [r[:] for r in matrix]
         mat_cp = mat_cp[1:]
         rows = range(len(mat_cp))
-
         for r in rows:
             mat_cp[r] = mat_cp[r][0:c] + mat_cp[r][c + 1:]
         sign = (-1) ** (c % 2)
@@ -51,5 +49,4 @@ def determinant(matrix):
         return matrix[0][0]
     if not all(mat_l == len(col) for col in matrix):
         raise ValueError("matrix must be a square matrix")
-
     return multi_determinant(matrix)
