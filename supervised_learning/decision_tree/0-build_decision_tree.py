@@ -1,3 +1,22 @@
+#!/usr/bin/env python3
+"""Decision Tree depth computation module."""
+
+import numpy as np
+
+
+class Node:
+    """Represents an internal node of a decision tree."""
+
+    def __init__(self, feature=None, threshold=None, left_child=None,
+                 right_child=None, is_root=False, depth=0):
+        """Initialize a decision tree node."""
+        self.feature = feature
+        self.threshold = threshold
+        self.left_child = left_child
+        self.right_child = right_child
+        self.is_leaf = False
+        self.is_root = is_root
+        self.sub_population = None
         self.depth = depth
 
     def max_depth_below(self):
@@ -6,7 +25,7 @@
             return self.depth
 
         left_depth = self.depth
-        right_depth = self.depth     
+        right_depth = self.depth
 
         if self.left_child is not None:
             left_depth = self.left_child.max_depth_below()
@@ -24,12 +43,12 @@ class Leaf(Node):
         """Initialize a leaf node."""
         super().__init__()
         self.value = value
-        self.is_leaf = True  
+        self.is_leaf = True
         self.depth = depth
 
     def max_depth_below(self):
         """Return the depth of the leaf."""
-        return self.depth      
+        return self.depth
 
 
 class Decision_Tree:
@@ -48,9 +67,8 @@ class Decision_Tree:
         self.max_depth = max_depth
         self.min_pop = min_pop
         self.split_criterion = split_criterion
-        self.predict = None     
+        self.predict = None
 
     def depth(self):
         """Return the maximum depth of the decision tree."""
         return self.root.max_depth_below()
-                                                                                                                                                                                    137,42        Bot
