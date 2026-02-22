@@ -5,16 +5,20 @@ def left_child_add_prefix(text):
     """Add prefix for left child in tree visualization"""
     lines = text.split("\n")
     new_text = "    +--" + lines[0] + "\n"
-    for x in lines[1:]:
+    for x in lines[1:-1]:  # Exclude last line to avoid extra newline
         new_text += "    |  " + x + "\n"
+    if len(lines) > 1:
+        new_text += "    |  " + lines[-1]
     return new_text
 
 def right_child_add_prefix(text):
     """Add prefix for right child in tree visualization"""
     lines = text.split("\n")
     new_text = "    +--" + lines[0] + "\n"
-    for x in lines[1:]:
+    for x in lines[1:-1]:  # Exclude last line to avoid extra newline
         new_text += "       " + x + "\n"
+    if len(lines) > 1:
+        new_text += "       " + lines[-1]
     return new_text
 
 
@@ -33,19 +37,31 @@ class Node:
     def __str__(self):
         """String representation of the node"""
         if self.is_root:
-            node_str = f"root [feature={self.feature}, threshold={self.threshold}]\n"
+            result = f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            node_str = f"    [feature={self.feature}, threshold={self.threshold}]\n"
+            result = f"node [feature={self.feature}, threshold={self.threshold}]\n"
         
         if self.left_child:
             left_str = self.left_child.__str__()
-            node_str += left_child_add_prefix(left_str)
+            # Add the left child with proper prefix
+            left_lines = left_str.rstrip('\n').split('\n')
+            for i, line in enumerate(left_lines):
+                if i == 0:
+                    result += "    +---> " + line + "\n"
+                else:
+                    result += "    |     " + line + "\n"
         
         if self.right_child:
             right_str = self.right_child.__str__()
-            node_str += right_child_add_prefix(right_str)
+            # Add the right child with proper prefix
+            right_lines = right_str.rstrip('\n').split('\n')
+            for i, line in enumerate(right_lines):
+                if i == 0:
+                    result += "    +---> " + line + "\n"
+                else:
+                    result += "          " + line + "\n"
         
-        return node_str
+        return result.rstrip('\n') + '\n' if result else ''
 
 
 class Leaf:
@@ -56,7 +72,7 @@ class Leaf:
         self.depth = depth
 
     def __str__(self):
-        return f"-> leaf [value={self.value}]"
+        return f"leaf [value={self.value}]"
 
 
 class Decision_Tree:
