@@ -111,4 +111,4 @@ class Decision_Tree:
         Returns:
             int: Number of nodes or leaves.
         """
-        return self.root.count_nodes_below(only_leaves=only_leaves)         
+        return self.root.count_nodes_below(only_leaves=only_leaves)
