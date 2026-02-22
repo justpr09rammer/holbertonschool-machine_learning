@@ -62,6 +62,10 @@ class Leaf(Node):
     def get_leaves_below(self):
         """Return the leaf itself as a list."""
         return [self]
+    
+    def __str__(self):
+        """Return a string representation of the leaf."""
+        return f"-> leaf [value={self.value}]"
 
 
 class Decision_Tree:
