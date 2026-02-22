@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
-"""Decision Tree printing module."""
-
 import numpy as np
+
+def left_child_add_prefix(text):
+    """Add prefix for left child in tree visualization"""
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += "    |  " + x + "\n"
+    return new_text
+
+def right_child_add_prefix(text):
+    """Add prefix for right child in tree visualization"""
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += "       " + x + "\n"
+    return new_text
 
 
 class Node:
-    """Represents an internal node of a decision tree."""
-
-    def __init__(self, feature=None, threshold=None, left_child=None,
-                 right_child=None, is_root=False, depth=0):
-        """Initialize a decision tree node."""
+    """Node class for decision tree"""
+    def __init__(self, feature=None, threshold=None, left_child=None, right_child=None, is_root=False, depth=0):
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -19,73 +30,39 @@ class Node:
         self.sub_population = None
         self.depth = depth
 
-    def left_child_add_prefix(self, text):
-        """Add prefix formatting to the left child string."""
-        lines = text.split("\n")
-        new_text = "+---> " + lines[0] + "\n"
-        for line in lines[1:]:
-            new_text += "| " + line + "\n"
-        return new_text.rstrip("\n")
-
-    def right_child_add_prefix(self, text):
-        """Add prefix formatting to the right child string."""
-        lines = text.split("\n")
-        new_text = "+---> " + lines[0] + "\n"
-        for line in lines[1:]:
-            new_text += "  " + line + "\n"
-        return new_text.rstrip("\n")
-
     def __str__(self):
-        """Return formatted string representation of the node."""
+        """String representation of the node"""
         if self.is_root:
-            text = f"root [feature={self.feature}, threshold={self.threshold}]"
+            node_str = f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            text = f"node [feature={self.feature}, threshold={self.threshold}]"
-
+            node_str = f"    [feature={self.feature}, threshold={self.threshold}]\n"
+        
         if self.left_child:
-            left_text = str(self.left_child)
-            text += "\n" + self.left_child_add_prefix(left_text)
-
+            left_str = self.left_child.__str__()
+            node_str += left_child_add_prefix(left_str)
+        
         if self.right_child:
-            right_text = str(self.right_child)
-            text += "\n" + self.right_child_add_prefix(right_text)
+            right_str = self.right_child.__str__()
+            node_str += right_child_add_prefix(right_str)
+        
+        return node_str
 
-        return text
 
-
-class Leaf(Node):
-    """Represents a leaf node of a decision tree."""
-
+class Leaf:
+    """Leaf class for decision tree"""
     def __init__(self, value, depth=None):
-        """Initialize a leaf node."""
-        super().__init__()
         self.value = value
         self.is_leaf = True
         self.depth = depth
 
     def __str__(self):
-        """Return string representation of a leaf."""
-        return f"leaf [value={self.value}]"
+        return f"-> leaf [value={self.value}]"
 
 
 class Decision_Tree:
-    """Represents a decision tree."""
-
-    def __init__(self, max_depth=10, min_pop=1, seed=0,
-                 split_criterion="random", root=None):
-        """Initialize the decision tree."""
-        self.rng = np.random.default_rng(seed)
-        if root:
-            self.root = root
-        else:
-            self.root = Node(is_root=True)
-        self.explanatory = None
-        self.target = None
-        self.max_depth = max_depth
-        self.min_pop = min_pop
-        self.split_criterion = split_criterion
-        self.predict = None
+    """Decision tree class"""
+    def __init__(self, root=None):
+        self.root = root
 
     def __str__(self):
-        """Return string representation of the tree."""
         return self.root.__str__()
