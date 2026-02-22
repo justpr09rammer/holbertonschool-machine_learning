@@ -22,21 +22,21 @@ class Node:
     def left_child_add_prefix(self, text):
         """Add prefix formatting to the left child string."""
         lines = text.split("\n")
-        new_text = "    +---> " + lines[0] + "\n"
+        new_text = "+---> " + lines[0] + "\n"
         for line in lines[1:]:
-            new_text += "    |      " + line + "\n"
+            new_text += "| " + line + "\n"
         return new_text.rstrip("\n")
 
     def right_child_add_prefix(self, text):
         """Add prefix formatting to the right child string."""
         lines = text.split("\n")
-        new_text = "    +---> " + lines[0] + "\n"
+        new_text = "+---> " + lines[0] + "\n"
         for line in lines[1:]:
-            new_text += "           " + line + "\n"
+            new_text += "  " + line + "\n"
         return new_text.rstrip("\n")
 
     def __str__(self):
-        """Return a formatted string representation of the node."""
+        """Return formatted string representation of the node."""
         if self.is_root:
             text = f"root [feature={self.feature}, threshold={self.threshold}]"
         else:
