@@ -1,110 +1,77 @@
 #!/usr/bin/env python3
 """
-Defines function that trains a loaded neural network model
-using mini-batch gradient descent
+    Optimization project
 """
-
-
 import tensorflow as tf
 shuffle_data = __import__('2-shuffle_data').shuffle_data
 
 
-def train_mini_batch(X_train, Y_train, X_valid, Y_valid, batch_size=32,
-                     epochs=5, load_path="/tmp/model.ckpt",
+def train_mini_batch(X_train, Y_train, X_valid, Y_valid,
+                     batch_size=32, epochs=5, load_path="/tmp/model.ckpt",
                      save_path="/tmp/model.ckpt"):
+    """ Shuffles data points in two matrices the same way
+        X_train is ndarray with shape (m, 784) containing traning data
+            m number of data points
+            784 is number of features
+        Y_train is ndarray with shape (m, 10) containing training labels
+            m number of data points
+            10 number of classes
+        X_valid (m, 784) contains validation data
+        Y_valid is one-hot (m, 10), validation labels
+        batch_size
+        epochs is # of times training passes through whole dataset
+        load_path/save_path where model stored
+        Returns: path where saved
+
+        allow for smaller final batch
+        shuffle training data before each epoch
     """
-    Trains a loaded neural network model using mini-batch gradient descent
-
-    parameters:
-        X_train [numpy.ndarray of shape (m, 784)]:
-            contains training data
-            m: number of data points
-            784: the number of input features
-        Y_train [one-hot numpy.ndarray of shape (m, 10)]:
-            contains training labels
-            m: number of data points, same as in X
-            10: number of classes the model should classify
-        X_valid [numpy.ndarray of shape (m, 784)]:
-            contains validation data
-            m: number of data points
-            784: the number of input features
-        Y_valid [one-hot numpy.ndarray of shape (m, 10)]:
-            contains validation labels
-            m: number of data points, same as in X
-            10: number of classes the model should classify
-        batch_size [int]:
-            number of data points in a batch
-        epochs [int]:
-            number of times the training should pass through the whole dataset
-        load_path [str]:
-            path from which to load the neural network model
-        save_path [str]:
-            path to where the neural network should be saved after training
-
-    loaded model will have the following tensors / ops in collection:
-        x: placeholder for the input data
-        y: placeholder for the labels
-        accuracy: op to calculate the accuracy of the model
-        loss: op to calculate the cost of the model
-        train_op: op to perform one pass of gradient descent on the model
-    before each epoch, training data should be shuffled
-    print training and validation statements before each epoch
-    print step, cost, and accuracy information every 100 steps within an epoch
-
-    returns:
-        the path where the model was saved
-    """
-    m = X_train.shape[0]
     with tf.Session() as sess:
-        saver = tf.train.import_meta_graph(load_path + '.meta')
+        saver = tf.train.import_meta_graph("{}.meta".format(load_path))
         saver.restore(sess, load_path)
+        m = X_train.shape[0]
+        batches = m / batch_size
+        if batches % 1 != 0:
+            batches = int(batches) + 1
+        else:
+            batches = int(batches)
         x = tf.get_collection('x')[0]
         y = tf.get_collection('y')[0]
         accuracy = tf.get_collection('accuracy')[0]
         loss = tf.get_collection('loss')[0]
         train_op = tf.get_collection('train_op')[0]
-
-        for epoch in range(epochs + 1):
-            print("After {} epochs:".format(epoch))
-            train_cost = sess.run(loss, feed_dict={x: X_train,
-                                                   y: Y_train})
-            print("\tTraining Cost: {}".format(train_cost))
-            train_accuracy = sess.run(accuracy, feed_dict={x: X_train,
-                                                           y: Y_train})
-            print("\tTraining Accuracy: {}".format(train_accuracy))
-            valid_cost = sess.run(loss, feed_dict={x: X_valid,
-                                                   y: Y_valid})
-            print("\tValidation Cost: {}".format(valid_cost))
-            valid_accuracy = sess.run(accuracy, feed_dict={x: X_valid,
-                                                           y: Y_valid})
-            print("\tValidation Accuracy: {}".format(valid_accuracy))
-            if epoch == epochs:
+        for i in range(epochs + 1):
+            train_cost = loss.eval({x: X_train,
+                                    y: Y_train})
+            train_accuracy = accuracy.eval({x: X_train,
+                                            y: Y_train})
+            valid_cost = loss.eval({x: X_valid,
+                                    y: Y_valid})
+            valid_accuracy = accuracy.eval({x: X_valid,
+                                            y: Y_valid})
+            print("After {} epochs:\n".format(i) +
+                  "\tTraining Cost: {}\n".format(train_cost) +
+                  "\tTraining Accuracy: {}\n".format(train_accuracy) +
+                  "\tValidation Cost: {}\n".format(valid_cost) +
+                  "\tValidation Accuracy: {}".format(valid_accuracy))
+            if i == epochs:
+                ''' Done training, last epoch metrics printed '''
                 break
-            X_train_s, Y_train_s = shuffle_data(X_train, Y_train)
-            if (m % batch_size) is 0:
-                mini_batch_total = m // batch_size
-            else:
-                mini_batch_total = (m // batch_size) + 1
-
-            step_number = 0
-            for mini_batch in range(mini_batch_total):
-                low = mini_batch * batch_size
-                high = ((mini_batch + 1) * batch_size)
-                if high > m:
-                    high = m
-                sess.run(train_op, feed_dict={x: X_train_s[low:high, :],
-                                              y: Y_train_s[low:high, :]})
-                step_number += 1
-                if (step_number % 100) is 0:
-                    print("\tStep {}:".format(step_number))
-                    step_cost = sess.run(
-                        loss,
-                        feed_dict={x: X_train_s[low:high, :],
-                                   y: Y_train_s[low:high, :]})
-                    print("\t\tCost: {}".format(step_cost))
-                    step_accuracy = sess.run(
-                        accuracy,
-                        feed_dict={x: X_train_s[low:high, :],
-                                   y: Y_train_s[low:high, :]})
-                    print("\t\tAccuracy: {}".format(step_accuracy))
-        return (saver.save(sess, save_path))
+            shuf_x, shuf_y = shuffle_data(X_train, Y_train)
+            for j in range(batches):
+                start = batch_size * j
+                end = batch_size * (j + 1)
+                '''if end > m:
+                    end = None'''
+                '''print("start", start, "end", end)'''
+                sess.run(train_op, feed_dict={x: shuf_x[start:end],
+                                              y: shuf_y[start:end]})
+                if (j + 1) % 100 == 0 and j != 0:
+                    step_cost = loss.eval({x: shuf_x[start:end],
+                                           y: shuf_y[start:end]})
+                    step_accuracy = accuracy.eval({x: shuf_x[start:end],
+                                                   y: shuf_y[start:end]})
+                    print("\tStep {}:\n".format(j + 1) +
+                          "\t\tCost: {}\n".format(step_cost) +
+                          "\t\tAccuracy: {}".format(step_accuracy))
+        return saver.save(sess, save_path)
