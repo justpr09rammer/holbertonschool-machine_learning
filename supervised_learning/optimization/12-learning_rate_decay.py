@@ -1,32 +1,27 @@
 #!/usr/bin/env python3
-"""
-Defines function that creates a learning rate decay op
-for a neural network in TensorFlow using inverse time decay
-"""
-
-
+""" Task 12: 12. Learning Rate Decay Upgraded  """
 import tensorflow as tf
 
 
-def learning_rate_decay(alpha, decay_rate, global_step, decay_step):
+def learning_rate_decay(alpha, decay_rate, decay_step):
     """
-    Creates a learning rate decay op for a neural network in TensorFlow
-        using inverse time decay
+    Updates the learning rate using inverse time decay in TensorFlow.
 
-    parameters:
-        alpha [float]: original learning rate
-        decay_rate: wight used to determine the rate at which alpha will decay
-        global_step [int]:
-            number of passes of gradient descent that have elapsed
-        decay_step [int]:
-            number of passes of gradient descent that should occur before
-                alpha is decayed furtherXS
+    Args:
+        alpha:
+            The original learning rate.
+        decay_rate:
+            The rate at which the learning rate decays.
+        decay_step:
+            The number of passes of gradient descent after which
+            the learning rate should decay.
 
-    the learning rate decay should occur in a stepwise fashion
-
-    returns:
-        the learning rate decay operation
+    Returns:
+        Tensor: The decayed learning rate as a TensorFlow operation.
     """
-    op = tf.train.inverse_time_decay(
-        alpha, global_step, decay_step, decay_rate, staircase=True)
-    return op
+
+    return tf.keras.optimizers.schedules.InverseTimeDecay(
+        initial_learning_rate=alpha,
+        decay_steps=decay_step,
+        decay_rate=decay_rate,
+        staircase=True)

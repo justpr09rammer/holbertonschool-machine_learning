@@ -1,44 +1,33 @@
 #!/usr/bin/env python3
-"""
-Defines function that creates a batch normalization layer
-for a neural network in TensorFlow
-"""
-
-
+""" Task 14: 14. Batch Normalization Upgraded """
 import tensorflow as tf
 
 
 def create_batch_norm_layer(prev, n, activation):
+    """Creates a batch normalization layer for a neural network in TensorFlow.
+
+    Args:
+        prev (tf.Tensor):
+            The activated output of the previous layer.
+        n (int):
+            The number of nodes in the layer to be created.
+        activation (function or None):
+            The activation function to apply on the output
+            of the layer. If None, no activation is applied.
+
+    Returns:
+        tf.Tensor:
+            The output of the batch normalization layer,
+            with activation applied if specified.
     """
-    Creates a batch normalization layer for a neural network in TensorFlow
-
-    parameters:
-        prev [tf.moment]: the activated output of the previous layer
-        n [int]: the number of nodes in the layer to be created
-        activation:
-            activation function that should be used on the output of the layer
-
-    utilize tf.layers.Dense layer as the base layer with
-        tf.contrib.layers.variance_scaling_initializer(mode="FAN_AVG")
-    incorporate two trainable parameters:
-        gamma: initialized as vectors of 1
-        beta: initialized as vectors of 0
-    epsilon = 1 x 10^-8
-
-    returns:
-        a tensor of the activated output for the layer
-    """
-    weights_initializer = tf.contrib.layers.variance_scaling_initializer(
-        mode="FAN_AVG")
-    layer = tf.layers.Dense(
-        n,
-        activation=activation,
-        name="layer",
-        kernal_initializer=weights_initializer)
-    x = layer[prev]
-    gamma = tf.Variable(tf.constant(
-        1, shape=(1, n), trainable=True, name="gamma"))
-    beta = tf.Variable(tf.constant(
-        0, shape=(1, n), trainable=True, name="gamma"))
-    Z = tf.nn.batch_normalization(x, mean, variance, beta, gamma, 1e-8)
-    return Z
+    init = tf.keras.initializers.VarianceScaling(mode='fan_avg')
+    layer = tf.keras.layers.Dense(n, kernel_initializer=init)
+    z = layer(prev)
+    gamma = tf.Variable(1., trainable=True)
+    beta = tf.Variable(0., trainable=True)
+    mean = tf.math.reduce_mean(z, axis=0)
+    var = tf.math.reduce_variance(z, axis=0)
+    epsilon = 1e-8
+    normalized = tf.nn.batch_normalization(
+        z, mean, var, beta, gamma, epsilon)
+    return activation(normalized)
