@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"importing linear algebra libary numpy"
 import numpy as np
 
 
