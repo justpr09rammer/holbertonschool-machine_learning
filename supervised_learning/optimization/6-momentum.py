@@ -1,26 +1,22 @@
 #!/usr/bin/env python3
-"""
-Defines function that creates the training op
-for a neural network in TensorFlow using
-the gradient descent with momentum optimization algorithm
-"""
-
-
+""" Task 6: 6. Momentum Upgraded  """
 import tensorflow as tf
 
 
-def create_momentum_op(loss, alpha, beta1):
+def create_momentum_op(alpha, beta1):
     """
     Creates the training operation for a neural network in TensorFlow
-        using the gradient descent with momentum optimization algorithm
+    using the gradient descent with momentum optimization algorithm.
 
-    parameters:
-        loss: the loss of the network
-        alpha [float]: learning rate
-        beta1 [float]: momentum weight
+    Args:
+        alpha (float): The learning rate, controlling the step size in the
+            optimization process.
+        beta1 (float): The momentum weight, controlling the contribution of
+            previous gradients to the update, a value between 0 and 1.
 
-    returns:
-        the momentum optimization operation
+    Returns:
+        tf.Operation: The operation that applies the gradient descent with
+        momentum optimization to minimize the loss.
     """
-    op = tf.train.MomentumOptimizer(alpha, beta1).minimize(loss)
-    return op
+    optimizer = tf.compat.v1.train.MomentumOptimizer(alpha, beta1)
+    return optimizer
