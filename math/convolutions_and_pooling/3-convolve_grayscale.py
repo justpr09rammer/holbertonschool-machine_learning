@@ -30,17 +30,12 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     Returns:
         numpy.ndarray containing the convolved images
     '''
-    m = images.shape[0]
-    h = images.shape[1]
-    w = images.shape[2]
-    kh = kernel.shape[0]
-    kw = kernel.shape[1]
-    sh = stride[0]
-    sw = stride[1]
+    m, h, w = images.shape
+    kh, kw = kernel.shape
+    sh, sw = stride
 
-    if type(padding) is tuple:
-        padh = padding[0]
-        padw = padding[1]
+    if isinstance(padding, tuple):
+        padh, padw = padding
     elif padding == 'same':
         padh = int((((h - 1) * sh - h + kh) / 2)) + 1
         padw = int((((w - 1) * sw - w + kw) / 2)) + 1
@@ -50,15 +45,21 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     nh = int(((h + (2 * padh) - kh) / sh)) + 1
     nw = int(((w + (2 * padw) - kw) / sw)) + 1
 
-    convolved = np.zeros([m, nh, nw])
+    convolved = np.zeros((m, nh, nw))
     pad = ((0, 0), (padh, padh), (padw, padw))
-    imagepaded = np.pad(images, pad_width=pad, mode='constant', constant_values=0)
+    imagepaded = np.pad(
+        images,
+        pad_width=pad,
+        mode='constant',
+        constant_values=0
+    )
 
     for i in range(nh):
         for j in range(nw):
             x = i * sh
             y = j * sw
-            image = imagepaded[:, x:x+kh, y:y+kw]
-            convolved[:, i, j] = np.multiply(image, kernel).sum(axis=(1, 2))
+            convolved[:, i, j] = np.multiply(
+                imagepaded[:, x:x+kh, y:y+kw], kernel
+            ).sum(axis=(1, 2))
 
     return convolved
