@@ -1,65 +1,66 @@
 #!/usr/bin/env python3
-'''Strided convolution on grayscale images'''
+'''Strided Convolution'''
 
 import numpy as np
 
 
 def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
-    '''performs convolution on grayscale images with optional padding and stride
-
+    '''performs a valid convolution on grayscale images
     Args:
-        images: array of shape (m, h, w) containing multiple grayscale images
-            m: number of images
-            h: image height in pixels
-            w: image width in pixels
-
-        kernel: array of shape (kh, kw) used as the convolution filter
-            kh: kernel height
-            kw: kernel width
-
-        padding: 'same', 'valid', or tuple (ph, pw)
-            'same': output has same dimensions as input
-            'valid': no padding applied
-            tuple: ph and pw specify padding for height and width
-            padding is applied with zeros
-
-        stride: tuple (sh, sw)
-            sh: stride along the height
-            sw: stride along the width
-
-    Returns:
-        numpy.ndarray containing the convolved images
+        images:array with shape (m, h, w) containing multiple grayscale images
+            m is the number of images
+            h is the height in pixels of the images
+            w is the width in pixels of the images
+        kernel: array with shape (kh, kw) containing the kernel
+            kh is the height of the kernel
+            kw is the width of the kernel
+        padding is a tuple of (ph, pw) ‘same’, or ‘valid’
+            if ‘same’, performs a same convolution
+            if ‘valid’, performs a valid convolution
+            if a tuple:
+                ph is the padding for the height of the image
+                pw is the padding for the width of the image
+            the image should be padded with 0’s
+        stride is a tuple of (sh, sw)
+            sh is the stride for the height of the image
+            sw is the stride for the width of the image
+        Return : a numpy.ndarray containing the convolved images
     '''
-    m, h, w = images.shape
-    kh, kw = kernel.shape
-    sh, sw = stride
-
-    if isinstance(padding, tuple):
-        padh, padw = padding
+    m = images.shape[0]
+    h = images.shape[1]
+    w = images.shape[2]
+    kh = kernel.shape[0]
+    kw = kernel.shape[1]
+    sh = stride[0]
+    sw = stride[1]
+    # # calculate padding according to type
+    if type(padding) is tuple:
+        # padding
+        padh = padding[0]
+        padw = padding[1]
     elif padding == 'same':
         padh = int((((h - 1) * sh - h + kh) / 2)) + 1
         padw = int((((w - 1) * sw - w + kw) / 2)) + 1
     elif padding == 'valid':
         padh = padw = 0
 
+    # new dimensions with stride
     nh = int(((h + (2 * padh) - kh) / sh)) + 1
     nw = int(((w + (2 * padw) - kw) / sw)) + 1
-
-    convolved = np.zeros((m, nh, nw))
+    # output
+    convolved = np.zeros([m, nh, nw])
+    # pad images
     pad = ((0, 0), (padh, padh), (padw, padw))
-    imagepaded = np.pad(
-        images,
-        pad_width=pad,
-        mode='constant',
-        constant_values=0
-    )
-
+    imagepaded = np.pad(images, pad_width=pad, mode='constant',
+                        constant_values=0)
+    # Loop over every pixel of the output
     for i in range(nh):
         for j in range(nw):
+            # apply strided
             x = i * sh
             y = j * sw
-            convolved[:, i, j] = np.multiply(
-                imagepaded[:, x:x+kh, y:y+kw], kernel
-            ).sum(axis=(1, 2))
-
+            # slice every image according to kernel size
+            image = imagepaded[:, x: x+kh, y: y+kw]
+            # element-wise multiplication of the kernel and the image
+            convolved[:, i, j] = np.multiply(image, kernel).sum(axis=(1, 2))
     return convolved
